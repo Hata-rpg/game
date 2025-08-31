@@ -3,91 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>古都探索譚 - v1.9</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    <title>古都探索譚</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0e6d2;
+            color: #3e2723;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            transition: opacity 1s ease-in-out;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Title Screen */
+        #title-screen {
+            background-color: #3e2723;
+            color: #f0e6d2;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #title-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        #title-screen button {
+            background-color: #d1b199;
+            color: #3e2723;
+            border: 2px solid #3e2723;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        #title-screen button:hover {
+            background-color: #e6d1b1;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+        }
+
+        /* Exploration Screen */
+        #exploration-screen {
+            flex-direction: column;
+            justify-content: space-between;
+            background: url('https://placehold.co/1920x1080/d1b199/3e2723?text=Kyoto+Map+Background') no-repeat center center/cover;
+            filter: brightness(0.8);
+            transition: filter 1s ease-in-out;
+        }
+
+        .exploration-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            filter: brightness(1.0);
+            transition: filter 1s ease-in-out;
+        }
+        .ui-panel {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 2px solid #3e2723;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .top-ui {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .status-box, .timer-box {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #3e2723;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            color: #3e2723;
+            text-align: left;
+            min-width: 180px;
+        }
+        #map {
+            flex-grow: 1;
+            height: 100%;
+            width: 100%;
+            z-index: 0;
+            cursor: move;
+        }
+        .log-box {
+            position: absolute;
+            bottom: 0;
+            width: calc(100% - 20px);
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #f0e6d2;
+            margin: 10px;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spot-pin {
+            border: 2px solid #3e2723;
+            background-color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .spot-pin:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 5px #ff5722;
+        }
+
+        /* Battle Screen */
+        #battle-screen {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #212121;
+            color: #fff;
+            position: relative;
+        }
+        .battle-ui {
+            width: 90%;
+            max-width: 600px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .hp-bars {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .hp-bar-container {
+            width: 45%;
+            background-color: #4a4a4a;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 20px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .hp-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            font-size: 0.8rem;
+        }
+        .hp-bar {
+            height: 100%;
+            background-color: #c62828;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .battle-log {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #666;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #battle-log-content {
+            white-space: pre-wrap;
+        }
+
+        /* Boss Image & Animation */
+        #boss-image {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            opacity: 0;
+            width: 250px;
+            height: auto;
+            transition: transform 1s ease-out, opacity 1s ease-out;
+            pointer-events: none; /* クリック不可に */
+        }
+        #boss-image.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        #boss-image.boss-disappear {
+            transform: translateX(-50%) translateY(100%) scale(0.5);
+            opacity: 0;
+            transition: transform 1s ease-out, opacity 1s ease-out;
+        }
+
+        /* End Screen */
+        #end-screen {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #3e2723;
+            color: #f0e6d2;
+        }
+        #end-message {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .end-button {
+            background-color: #d1b199;
+            color: #3e2723;
+            border: 2px solid #3e2723;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            margin: 10px;
+        }
+        .end-button:hover {
+            background-color: #e6d1b1;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .body-fade-in-red {
+            background-color: #c62828;
+            transition: background-color 1s ease-in-out;
+        }
+        
+    </style>
 </head>
 <body>
-
-    <!-- タイトル画面 -->
-    <div id="title-screen" class="game-container active">
-        <div class="content">
-            <h1 class="game-title">古都探索譚</h1>
-            <p class="version">v1.9</p>
-            <button id="start-game-button">探索開始</button>
+    <div class="container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <h1>古都探索譚</h1>
+            <p>60秒で京都の呪物を集め、禍の化身を討て。</p>
+            <button id="start-game-button">探索を始める</button>
         </div>
-    </div>
 
-    <!-- 探索パート -->
-    <div id="exploration-screen" class="game-container">
-        <div class="exploration-container">
-            <div id="top-ui">
-                <div id="timer-box" class="status-box">
-                    <h2>残り時間</h2>
-                    <p><span id="game-timer">60</span>秒</p>
-                </div>
-                <div id="player-status" class="status-box">
-                    <h2>探索者ステータス</h2>
-                    <div class="status-grid">
+        <!-- Exploration Screen -->
+        <div id="exploration-screen" class="screen">
+            <div class="exploration-container">
+                <div class="top-ui">
+                    <div class="status-box">
+                        <p>HP: <span id="player-hp">100</span></p>
                         <p>攻撃: <span id="player-attack">10</span></p>
                         <p>防御: <span id="player-defense">10</span></p>
-                        <p>HP: <span id="player-hp">100</span></p>
                         <p>敏捷: <span id="player-agility">10</span></p>
                         <p>回避率: <span id="player-evasion">10</span>%</p>
                         <p>会心率: <span id="player-critical">10</span>%</p>
                     </div>
-                </div>
-            </div>
-            <div id="map"></div>
-            <div id="log-box" class="status-box">
-                <div id="log-content"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 戦闘パート -->
-    <div id="battle-screen" class="game-container">
-        <div class="battle-container">
-            <div class="character-area boss-area">
-                <div id="boss-battle-info" class="battle-info-box">
-                    <h2>禍の化身</h2>
-                    <p>HP: <span id="boss-hp">600</span></p>
-                    <div class="hp-bar-container">
-                        <div id="boss-hp-bar" class="hp-bar"></div>
+                    <div class="timer-box">
+                        <p>残り時間: <span id="game-timer">60.00</span></p>
                     </div>
                 </div>
-                <img id="boss-image" src="https://via.placeholder.com/200x200?text=Boss" alt="禍の化身">
+                <div id="map"></div>
+                <div class="log-box">
+                    <span id="log-content"></span>
+                </div>
             </div>
-            <div class="character-area player-area">
-                <img id="player-image" src="https://via.placeholder.com/150x150?text=Player" alt="探索者">
-                <div id="player-battle-info" class="battle-info-box">
-                    <h2>探索者</h2>
-                    <p>HP: <span id="battle-player-hp">100</span></p>
+        </div>
+
+        <!-- Battle Screen -->
+        <div id="battle-screen" class="screen">
+            <div class="battle-ui">
+                <div class="hp-bars">
                     <div class="hp-bar-container">
                         <div id="player-hp-bar" class="hp-bar"></div>
+                        <span class="hp-label">HP: <span id="battle-player-hp">100</span></span>
+                    </div>
+                    <div class="hp-bar-container">
+                        <div id="boss-hp-bar" class="hp-bar"></div>
+                        <span class="hp-label">ボスHP: <span id="boss-hp">600</span></span>
                     </div>
                 </div>
-            </div>
-            <div id="battle-log" class="status-box battle-log-box">
-                <div id="battle-log-content"></div>
+                <img id="boss-image" src="boss1.png" alt="禍の化身">
+                <div class="battle-log">
+                    <span id="battle-log-content"></span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ゲーム終了画面 -->
-    <div id="end-screen" class="game-container">
-        <div class="content">
-            <h1 id="end-message"></h1>
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h2 id="end-message"></h2>
             <p id="fragment-info"></p>
-            <button id="next-stage-button" style="display: none;">次のステージへ</button>
-            <button id="restart-button">最初からやり直す</button>
+            <button id="next-stage-button" class="end-button">次のステージへ</button>
+            <button id="restart-button" class="end-button">最初からやり直す</button>
         </div>
     </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="script.js"></script>
 </body>
 </html>
