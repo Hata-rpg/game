@@ -1,4 +1,4 @@
-// 古都探索譚 - v1.7
+// 古都探索譚 - v1.9
 
 // DOM要素の取得
 const titleScreen = document.getElementById('title-screen');
@@ -48,15 +48,20 @@ const spots = [
 
 const sounds = {
     bgm: {
-        exploration: new Howl({ src: ['/path/to/exploration_bgm.mp3'], loop: true, volume: 0.5 }),
-        battle: new Howl({ src: ['/path/to/battle_bgm.mp3'], loop: true, volume: 0.5 })
+        exploration: new Howl({ src: ['/game/exploration_bgm.mp3'], loop: true, volume: 0.5 }),
+        battle: new Howl({ src: ['/game/battle_bgm.mp3'], loop: true, volume: 0.5 })
     },
     se: {
-        mouseover: new Howl({ src: ['/path/to/mouseover.mp3'] }),
-        click: new Howl({ src: ['/path/to/click.mp3'] }),
-        attack: new Howl({ src: ['/path/to/attack_se.mp3'] }),
-        damage: new Howl({ src: ['/path/to/damage_se.mp3'] }),
-        bossDisappear: new Howl({ src: ['/path/to/boss_disappear.mp3'] })
+        mouseover: new Howl({ src: ['/game/Assorted_SE06-07.mp3'] }),
+        buttonMouseover: new Howl({ src: ['/game/Assorted_SE08-13.mp3'] }),
+        start: new Howl({ src: ['/game/Horror_Accent09-1.mp3'] }),
+        playerAttack: new Howl({ src: ['/game/剣で斬る2.mp3'] }),
+        playerDamage: new Howl({ src: ['/game/重いパンチ3.mp3'] }),
+        walk: new Howl({ src: ['/game/足音・草原を走る（WASD移動）.mp3'], loop: true, volume: 0.5 }),
+        win: new Howl({ src: ['/game/kidouontekina1.mp3'] }),
+        bossEnter: new Howl({ src: ['/game/ゴブリンの鳴き声2.mp3'] }),
+        bossDefeat: new Howl({ src: ['/game/地響き.mp3'] }),
+        spotClick: new Howl({ src: ['/game/Assorted_SE06-07.mp3'] }),
     }
 };
 
@@ -116,6 +121,7 @@ function startGame() {
     switchScreen('exploration');
     initMap();
     startTimer();
+    sounds.se.start.play();
     sounds.bgm.exploration.play();
     addLog('探索パート開始。60秒以内に禍を討つ力を集めよ。');
 }
@@ -176,7 +182,7 @@ function initMap() {
 function visitSpot(spot, marker) {
     if (game.visitedSpots.has(spot.name)) {
         addLog(`${spot.name}は既に訪れました。`);
-        sounds.se.click.play();
+        sounds.se.spotClick.play();
         return;
     }
 
@@ -227,20 +233,27 @@ function visitSpot(spot, marker) {
     game.visitedSpots.add(spot.name);
     marker.setOpacity(0.3);
     updateStatus();
-    sounds.se.click.play();
+    sounds.se.spotClick.play();
 }
 
 function startTimer() {
-    document.getElementById('game-timer').textContent = game.timer;
+    game.timer = 60;
+    const timerElement = document.getElementById('game-timer');
+    timerElement.textContent = game.timer.toFixed(2);
+    
+    const startTime = Date.now();
     game.timerInterval = setInterval(() => {
-        game.timer--;
-        document.getElementById('game-timer').textContent = game.timer;
+        const elapsedTime = (Date.now() - startTime) / 1000;
+        game.timer = 60 - elapsedTime;
         if (game.timer <= 0) {
             clearInterval(game.timerInterval);
+            timerElement.textContent = '0.00';
             addLog('時間切れ！禍の化身が姿を現した！');
             setTimeout(startBattle, 2000);
+        } else {
+            timerElement.textContent = game.timer.toFixed(2);
         }
-    }, 1000);
+    }, 10);
 }
 
 function startBattle() {
@@ -249,6 +262,7 @@ function startBattle() {
     switchScreen('battle');
     sounds.bgm.exploration.stop();
     sounds.bgm.battle.play();
+    sounds.se.bossEnter.play();
     updateBattleStatus();
     addBattleLog('禍の化身が立ちはだかる！戦闘開始！', () => {
         setTimeout(battleLoop, 2000);
@@ -294,7 +308,7 @@ function playerTurn(onComplete) {
     if (isCritical) {
         finalDamage *= 2;
         addBattleLog('会心の一撃！', () => {
-            sounds.se.attack.play();
+            sounds.se.playerAttack.play();
             boss.hp -= finalDamage;
             addBattleLog(`探索者の攻撃！禍の化身に${finalDamage.toFixed(0)}のダメージ！`, () => {
                 updateBattleStatus();
@@ -308,7 +322,7 @@ function playerTurn(onComplete) {
     } else {
         boss.hp -= finalDamage;
         addBattleLog(`探索者の攻撃！禍の化身に${finalDamage.toFixed(0)}のダメージ！`, () => {
-            sounds.se.attack.play();
+            sounds.se.playerAttack.play();
             updateBattleStatus();
             if (boss.hp <= 0) {
                 endGame('win');
@@ -338,7 +352,7 @@ function bossTurn(onComplete) {
         }
         player.hp -= finalDamage;
         addBattleLog(`禍の化身の攻撃！探索者は${finalDamage.toFixed(0)}のダメージを受けた！`, () => {
-            sounds.se.damage.play();
+            sounds.se.playerDamage.play();
             updateBattleStatus();
             if (player.hp <= 0) {
                 endGame('lose');
@@ -359,11 +373,12 @@ function endGame(result) {
     const restartButton = document.getElementById('restart-button');
 
     if (result === 'win') {
+        sounds.se.win.play();
         endMessage.textContent = '勝利！';
         explorationScreen.querySelector('.exploration-container').style.filter = 'brightness(1.0)';
         const bossImage = document.getElementById('boss-image');
         bossImage.classList.add('boss-disappear');
-        sounds.se.bossDisappear.play();
+        sounds.se.bossDefeat.play();
 
         const fragment = Math.floor(Math.random() * 3);
         let statChanged = '';
@@ -420,6 +435,21 @@ const moveSpeed = 0.0001;
 const fastMoveSpeed = 0.0002;
 let currentSpeed = moveSpeed;
 let playerPos = { x: 0, y: 0 };
+let isMoving = false;
+
+function handleMovement(isKeyDown) {
+    if (!game.isExploration) return;
+
+    if (isKeyDown) {
+        if (!isMoving) {
+            isMoving = true;
+            sounds.se.walk.play();
+        }
+    } else {
+        isMoving = false;
+        sounds.se.walk.stop();
+    }
+}
 
 document.addEventListener('keydown', (e) => {
     if (!game.isExploration) return;
@@ -445,6 +475,7 @@ document.addEventListener('keydown', (e) => {
             currentSpeed = fastMoveSpeed;
             break;
     }
+    handleMovement(true);
 });
 
 document.addEventListener('keyup', (e) => {
@@ -466,6 +497,9 @@ document.addEventListener('keyup', (e) => {
         case 'Shift':
             currentSpeed = moveSpeed;
             break;
+    }
+    if (playerPos.x === 0 && playerPos.y === 0) {
+        handleMovement(false);
     }
 });
 
@@ -497,4 +531,6 @@ document.getElementById('restart-button').addEventListener('click', () => {
 
 window.addEventListener('load', () => {
     initMap();
+    document.getElementById('start-game-button').addEventListener('mouseover', () => sounds.se.buttonMouseover.play());
+    document.getElementById('restart-button').addEventListener('mouseover', () => sounds.se.buttonMouseover.play());
 });
