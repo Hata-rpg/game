@@ -46,26 +46,38 @@ const spots = [
     { name: '東寺', lat: 34.9806, lng: 135.7485, type: 'agility_major', effect: '敏捷 x 1.5倍' },
 ];
 
-const sounds = {
-    bgm: {
-        // パスから '/game/' を削除
-        exploration: new Howl({ src: ['exploration_bgm.mp3'], loop: true, volume: 0.5 }),
-        battle: new Howl({ src: ['battle_bgm.mp3'], loop: true, volume: 0.5 })
-    },
+// sounds オブジェクトを宣言し、初期値はnullとする
+let sounds = {
+    bgm: { exploration: null, battle: null },
     se: {
-        // パスから '/game/' を削除
-        mouseover: new Howl({ src: ['Assorted_SE06-07.mp3'] }),
-        buttonMouseover: new Howl({ src: ['Assorted_SE08-13.mp3'] }),
-        start: new Howl({ src: ['Horror_Accent09-1.mp3'] }),
-        playerAttack: new Howl({ src: ['剣で斬る2.mp3'] }),
-        playerDamage: new Howl({ src: ['重いパンチ3.mp3'] }),
-        walk: new Howl({ src: ['足音・草原を走る（WASD移動）.mp3'], loop: true, volume: 0.5 }),
-        win: new Howl({ src: ['kidouontekina1.mp3'] }),
-        bossEnter: new Howl({ src: ['ゴブリンの鳴き声2.mp3'] }),
-        bossDefeat: new Howl({ src: ['地響き.mp3'] }),
-        spotClick: new Howl({ src: ['Assorted_SE06-07.mp3'] }),
+        mouseover: null,
+        buttonMouseover: null,
+        start: null,
+        playerAttack: null,
+        playerDamage: null,
+        walk: null,
+        win: null,
+        bossEnter: null,
+        bossDefeat: null,
+        spotClick: null,
     }
 };
+
+// サウンドを初期化する関数
+function initSounds() {
+    sounds.bgm.exploration = new Howl({ src: ['exploration_bgm.mp3'], loop: true, volume: 0.5 });
+    sounds.bgm.battle = new Howl({ src: ['battle_bgm.mp3'], loop: true, volume: 0.5 });
+    sounds.se.mouseover = new Howl({ src: ['Assorted_SE06-07.mp3'] });
+    sounds.se.buttonMouseover = new Howl({ src: ['Assorted_SE08-13.mp3'] });
+    sounds.se.start = new Howl({ src: ['Horror_Accent09-1.mp3'] });
+    sounds.se.playerAttack = new Howl({ src: ['剣で斬る2.mp3'] });
+    sounds.se.playerDamage = new Howl({ src: ['重いパンチ3.mp3'] });
+    sounds.se.walk = new Howl({ src: ['足音・草原を走る（WASD移動）.mp3'], loop: true, volume: 0.5 });
+    sounds.se.win = new Howl({ src: ['kidouontekina1.mp3'] });
+    sounds.se.bossEnter = new Howl({ src: ['ゴブリンの鳴き声2.mp3'] });
+    sounds.se.bossDefeat = new Howl({ src: ['地響き.mp3'] });
+    sounds.se.spotClick = new Howl({ src: ['Assorted_SE06-07.mp3'] });
+}
 
 function typeMessage(elementId, message, onComplete = () => {}) {
     const element = document.getElementById(elementId);
@@ -176,6 +188,7 @@ function initMap() {
         });
         const marker = L.marker([spot.lat, spot.lng], { icon: spotIcon }).addTo(game.map);
         marker.on('click', () => visitSpot(spot, marker));
+        // マウスオーバー時にサウンドを再生
         marker.on('mouseover', () => sounds.se.mouseover.play());
         game.spotMarkers.push({ spot, marker });
     });
@@ -522,7 +535,9 @@ window.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 startButton.addEventListener('click', () => {
-    sounds.bgm.exploration.play();
+    // サウンドを初期化
+    initSounds();
+    // ゲームを開始
     startGame();
 });
 
