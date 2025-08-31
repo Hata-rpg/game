@@ -48,20 +48,22 @@ const spots = [
 
 const sounds = {
     bgm: {
-        exploration: new Howl({ src: ['/game/exploration_bgm.mp3'], loop: true, volume: 0.5 }),
-        battle: new Howl({ src: ['/game/battle_bgm.mp3'], loop: true, volume: 0.5 })
+        // パスから '/game/' を削除
+        exploration: new Howl({ src: ['exploration_bgm.mp3'], loop: true, volume: 0.5 }),
+        battle: new Howl({ src: ['battle_bgm.mp3'], loop: true, volume: 0.5 })
     },
     se: {
-        mouseover: new Howl({ src: ['/game/Assorted_SE06-07.mp3'] }),
-        buttonMouseover: new Howl({ src: ['/game/Assorted_SE08-13.mp3'] }),
-        start: new Howl({ src: ['/game/Horror_Accent09-1.mp3'] }),
-        playerAttack: new Howl({ src: ['/game/剣で斬る2.mp3'] }),
-        playerDamage: new Howl({ src: ['/game/重いパンチ3.mp3'] }),
-        walk: new Howl({ src: ['/game/足音・草原を走る（WASD移動）.mp3'], loop: true, volume: 0.5 }),
-        win: new Howl({ src: ['/game/kidouontekina1.mp3'] }),
-        bossEnter: new Howl({ src: ['/game/ゴブリンの鳴き声2.mp3'] }),
-        bossDefeat: new Howl({ src: ['/game/地響き.mp3'] }),
-        spotClick: new Howl({ src: ['/game/Assorted_SE06-07.mp3'] }),
+        // パスから '/game/' を削除
+        mouseover: new Howl({ src: ['Assorted_SE06-07.mp3'] }),
+        buttonMouseover: new Howl({ src: ['Assorted_SE08-13.mp3'] }),
+        start: new Howl({ src: ['Horror_Accent09-1.mp3'] }),
+        playerAttack: new Howl({ src: ['剣で斬る2.mp3'] }),
+        playerDamage: new Howl({ src: ['重いパンチ3.mp3'] }),
+        walk: new Howl({ src: ['足音・草原を走る（WASD移動）.mp3'], loop: true, volume: 0.5 }),
+        win: new Howl({ src: ['kidouontekina1.mp3'] }),
+        bossEnter: new Howl({ src: ['ゴブリンの鳴き声2.mp3'] }),
+        bossDefeat: new Howl({ src: ['地響き.mp3'] }),
+        spotClick: new Howl({ src: ['Assorted_SE06-07.mp3'] }),
     }
 };
 
