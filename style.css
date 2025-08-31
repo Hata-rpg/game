@@ -1,5 +1,5 @@
 /*
- * 古都探索譚 - v1.7
+ * 古都探索譚 - v1.9
  */
 body {
     margin: 0;
@@ -52,16 +52,16 @@ h1 {
     margin-bottom: 2em;
 }
 
-/* タイトルを黒く修正 */
+/* タイトルを修正 */
 .game-title {
     font-size: 3.5em;
     font-weight: bold;
-    color: #000;
-    text-shadow: 0 0 10px #f0f0f0, 0 0 20px #e0e0e0, 0 0 30px #d0d0d0;
+    color: #d0d0d0;
+    text-shadow: 0 0 10px #444, 0 0 20px #555, 0 0 30px #666;
     letter-spacing: 0.2em;
-    background: linear-gradient(135deg, #a0a0a0, #666);
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(135deg, #a0a0a0, #666);
+    -webkit-background-clip: text;
 }
 
 
@@ -94,13 +94,21 @@ button:hover {
     transition: filter 2s ease;
     display: grid;
     grid-template-areas:
-        "status map"
-        "log map";
-    grid-template-columns: 350px 1fr;
-    grid-template-rows: 1fr 120px;
+        "top-ui"
+        "map"
+        "log";
+    grid-template-rows: auto 1fr auto;
     gap: 1rem;
     padding: 1rem;
     box-sizing: border-box;
+}
+
+#top-ui {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    grid-area: top-ui;
+    z-index: 1001;
 }
 
 #map {
@@ -121,10 +129,8 @@ button:hover {
 }
 
 #player-status {
-    grid-area: status;
-    display: flex;
-    flex-direction: column;
     text-align: left;
+    min-width: 250px;
 }
 
 /* ステータスウインドウの行間の余白を調整 */
@@ -141,18 +147,11 @@ button:hover {
 }
 
 #timer-box {
-    grid-area: timer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
     width: 180px;
     text-align: center;
 }
 
-#log-box, #battle-log {
+#log-box {
     grid-area: log;
     height: 120px;
     padding: 1.5rem;
@@ -190,11 +189,13 @@ button:hover {
 .battle-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     width: 90%;
     max-width: 900px;
     height: 90vh;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .character-area {
@@ -233,9 +234,13 @@ button:hover {
     padding: 1rem;
     border: 1px solid #333;
     border-radius: 5px;
-    text-align: center;
-    margin-bottom: 10px;
+    text-align: left;
     width: 250px;
+    margin-bottom: 10px;
+}
+
+.battle-info-box h2 {
+    text-align: center;
 }
 
 .hp-bar-container {
@@ -254,6 +259,7 @@ button:hover {
 }
 
 .battle-log-box {
+    position: absolute;
     bottom: 1rem;
     left: 1rem;
     right: 1rem;
