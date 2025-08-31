@@ -279,6 +279,11 @@ function startBattle() {
     sounds.bgm.battle.play();
     sounds.se.bossEnter.play();
     updateBattleStatus();
+
+    // ボス画像を表示する
+    const bossImage = document.getElementById('boss-image');
+    bossImage.classList.add('active');
+
     addBattleLog('禍の化身が立ちはだかる！戦闘開始！', () => {
         setTimeout(battleLoop, 2000);
     });
@@ -386,12 +391,15 @@ function endGame(result) {
     const fragmentInfo = document.getElementById('fragment-info');
     const nextStageButton = document.getElementById('next-stage-button');
     const restartButton = document.getElementById('restart-button');
+    const bossImage = document.getElementById('boss-image');
 
     if (result === 'win') {
         sounds.se.win.play();
         endMessage.textContent = '勝利！';
         explorationScreen.querySelector('.exploration-container').style.filter = 'brightness(1.0)';
-        const bossImage = document.getElementById('boss-image');
+        
+        // ボス画像を非表示にする
+        bossImage.classList.remove('active');
         bossImage.classList.add('boss-disappear');
         sounds.se.bossDefeat.play();
 
@@ -442,7 +450,12 @@ function resetGame() {
         game.map.remove();
         game.map = null;
     }
-    document.getElementById('boss-image').classList.remove('boss-disappear');
+
+    // ボス画像のクラスをリセット
+    const bossImage = document.getElementById('boss-image');
+    bossImage.classList.remove('active');
+    bossImage.classList.remove('boss-disappear');
+
     switchScreen('title');
 }
 
