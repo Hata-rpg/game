@@ -1,0 +1,307 @@
+/*
+ * 古都探索譚 - v1.7
+ */
+body {
+    margin: 0;
+    font-family: 'Noto Serif JP', serif;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    cursor: default;
+}
+
+.game-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #000;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+    font-size: 1.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #a0a0a0;
+    text-shadow: 0 0 5px #fff;
+}
+
+.game-container.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.content {
+    padding: 2.5rem;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid #333;
+    border-radius: 5px;
+}
+
+.version {
+    font-size: 0.8em;
+    color: #555;
+    margin-top: -1em;
+    margin-bottom: 2em;
+}
+
+/* タイトルを黒く修正 */
+.game-title {
+    font-size: 3.5em;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 0 10px #f0f0f0, 0 0 20px #e0e0e0, 0 0 30px #d0d0d0;
+    letter-spacing: 0.2em;
+    background: linear-gradient(135deg, #a0a0a0, #666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+button {
+    padding: 12px 24px;
+    font-size: 1.1em;
+    font-family: 'Noto Serif JP', serif;
+    cursor: pointer;
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 5px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+button:hover {
+    background-color: #333;
+    border-color: #888;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* 探索パートのスタイル */
+.exploration-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    filter: brightness(1.0);
+    transition: filter 2s ease;
+    display: grid;
+    grid-template-areas:
+        "status map"
+        "log map";
+    grid-template-columns: 350px 1fr;
+    grid-template-rows: 1fr 120px;
+    gap: 1rem;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+#map {
+    grid-area: map;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    cursor: crosshair;
+}
+
+.status-box {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+    border: 1px solid #333;
+    border-radius: 5px;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+#player-status {
+    grid-area: status;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+/* ステータスウインドウの行間の余白を調整 */
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2rem 1rem;
+    margin-top: 1rem;
+}
+
+.status-grid p {
+    margin: 0;
+    line-height: 1.2;
+}
+
+#timer-box {
+    grid-area: timer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    text-align: center;
+}
+
+#log-box, #battle-log {
+    grid-area: log;
+    height: 120px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+#log-content, #battle-log-content {
+    display: inline-block;
+    white-space: pre-wrap;
+    text-shadow: 0 0 2px #fff;
+}
+
+/* スポットピンのカスタムスタイル */
+.leaflet-marker-icon.spot-pin {
+    border: 2px solid #a0a0a0;
+    border-radius: 50%;
+    background-color: #a0a0a0;
+    width: 15px !important;
+    height: 15px !important;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.leaflet-marker-icon.spot-pin:hover {
+    box-shadow: 0 0 10px #a0a0a0;
+    transform: scale(1.4) translate(-50%, -50%);
+}
+
+/* 戦闘パートのスタイル */
+.battle-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 900px;
+    height: 90vh;
+}
+
+.character-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 20px;
+}
+
+.player-area {
+    order: 2;
+}
+
+.boss-area {
+    order: 1;
+    flex-grow: 1;
+}
+
+#boss-image {
+    width: auto;
+    max-width: 300px;
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+}
+
+#player-image {
+    width: auto;
+    max-width: 200px;
+    height: auto;
+}
+
+.battle-info-box {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+    border: 1px solid #333;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 10px;
+    width: 250px;
+}
+
+.hp-bar-container {
+    width: 100%;
+    height: 15px;
+    background-color: #555;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.hp-bar {
+    height: 100%;
+    background-color: #0f0;
+    transition: width 0.5s ease-in-out;
+}
+
+.battle-log-box {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    height: 120px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+
+/* アニメーション */
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes disappear {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(50px) scale(0.5); }
+}
+
+.boss-disappear {
+    animation: shake 0.5s, disappear 2s forwards 0.5s;
+}
+
+@keyframes fade-in-red {
+    0% { background-color: #000; }
+    100% { background-color: #3f0000; }
+}
+
+.body-fade-in-red {
+    animation: fade-in-red 2s forwards;
+}
+
+/* タイプライターエフェクト */
+.typewriter {
+    animation: typing 1s steps(20, end);
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: .15em solid #fff;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}

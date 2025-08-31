@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古都探索譚 - v1.7</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- タイトル画面 -->
+    <div id="title-screen" class="game-container active">
+        <div class="content">
+            <h1 class="game-title">古都探索譚</h1>
+            <p class="version">v1.7</p>
+            <button id="start-game-button">探索開始</button>
+        </div>
+    </div>
+
+    <!-- 探索パート -->
+    <div id="exploration-screen" class="game-container">
+        <div class="exploration-container">
+            <div id="map"></div>
+            <div id="player-status" class="status-box">
+                <h2>探索者ステータス</h2>
+                <div class="status-grid">
+                    <p>攻撃: <span id="player-attack">10</span></p>
+                    <p>防御: <span id="player-defense">10</span></p>
+                    <p>HP: <span id="player-hp">100</span></p>
+                    <p>敏捷: <span id="player-agility">10</span></p>
+                    <p>回避率: <span id="player-evasion">10</span>%</p>
+                    <p>会心率: <span id="player-critical">10</span>%</p>
+                </div>
+            </div>
+            <div id="timer-box" class="status-box">
+                <h2>残り時間</h2>
+                <p><span id="game-timer">60</span>秒</p>
+            </div>
+            <div id="log-box" class="status-box">
+                <div id="log-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 戦闘パート -->
+    <div id="battle-screen" class="game-container">
+        <div class="battle-container">
+            <div class="character-area player-area">
+                <div id="player-battle-info" class="battle-info-box">
+                    <h2>探索者</h2>
+                    <p>HP: <span id="battle-player-hp">100</span></p>
+                    <div class="hp-bar-container">
+                        <div id="player-hp-bar" class="hp-bar"></div>
+                    </div>
+                </div>
+                <img id="player-image" src="https://via.placeholder.com/150x150?text=Player" alt="探索者">
+            </div>
+            <div class="character-area boss-area">
+                <img id="boss-image" src="https://via.placeholder.com/200x200?text=Boss" alt="禍の化身">
+                <div id="boss-battle-info" class="battle-info-box">
+                    <h2>禍の化身</h2>
+                    <p>HP: <span id="boss-hp">600</span></p>
+                    <div class="hp-bar-container">
+                        <div id="boss-hp-bar" class="hp-bar"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="battle-log" class="status-box battle-log-box">
+                <div id="battle-log-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム終了画面 -->
+    <div id="end-screen" class="game-container">
+        <div class="content">
+            <h1 id="end-message"></h1>
+            <p id="fragment-info"></p>
+            <button id="next-stage-button" style="display: none;">次のステージへ</button>
+            <button id="restart-button">最初からやり直す</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
